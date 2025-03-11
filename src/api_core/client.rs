@@ -42,6 +42,7 @@ use std::collections::HashMap;
 use std::fmt::Debug;
 
 use super::endpoints::adding_tags::{SearchTags, SearchTagsResponse, TagSearchOptions};
+use super::endpoints::adding_times::{SetTime, SetTimeRequest};
 
 const ACCESS_KEY_HEADER: &str = "Hydrus-Client-API-Access-Key";
 const CONTENT_TYPE_HEADER: &str = "Content-Type";
@@ -374,6 +375,14 @@ impl Client {
     pub async fn delete_notes(&self, id: FileIdentifier, note_names: Vec<String>) -> Result<()> {
         self.post::<DeleteNotes>(DeleteNotesRequest::new(id, note_names))
             .await?;
+
+        Ok(())
+    }
+
+    /// Sets the notes for the file
+    #[tracing::instrument(skip(self), level = "debug")]
+    pub async fn set_time(&self, id: FileIdentifier, request: SetTimeRequest) -> Result<()> {
+        self.post::<SetTime>(request).await?;
 
         Ok(())
     }
