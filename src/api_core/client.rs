@@ -35,7 +35,7 @@ use crate::api_core::endpoints::searching_and_fetching_files::{
 use crate::api_core::endpoints::Endpoint;
 use crate::error::{Error, Result};
 use bytes::Buf;
-use reqwest::Response;
+use reqwest::{Body, Response};
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use std::collections::HashMap;
@@ -110,8 +110,8 @@ impl Client {
 
     /// Adds a file from binary data to hydrus
     #[tracing::instrument(skip(self, data), level = "debug")]
-    pub async fn add_binary_file(&self, data: Vec<u8>) -> Result<AddFileResponse> {
-        self.post_binary::<AddFile>(data).await
+    pub async fn add_binary_file<B: Into<Body>>(&self, data: B) -> Result<AddFileResponse> {
+        self.post_binary::<AddFile, _>(data).await
     }
 
     /// Moves files with matching hashes to the trash
@@ -568,7 +568,7 @@ impl Client {
     /// This currently only supports JSON because of a limitation of the
     /// hydrus client api.
     #[tracing::instrument(skip(self, data), level = "trace")]
-    async fn post_binary<E: Endpoint>(&self, data: Vec<u8>) -> Result<E::Response> {
+    async fn post_binary<E: Endpoint, B: Into<Body>>(&self, data: B) -> Result<E::Response> {
         tracing::trace!("Binary POST request to {}", E::path());
 
         #[cfg(feature = "cbor")]
