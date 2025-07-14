@@ -71,6 +71,25 @@ impl Endpoint for UndeleteFiles {
 }
 
 #[derive(Clone, Debug, Serialize)]
+pub struct MigrateFilesRequest {
+    #[serde(flatten)]
+    pub file_selection: FileSelection,
+    #[serde(flatten)]
+    pub service_selection: FileServiceSelection,
+}
+
+pub struct MigrateFiles;
+
+impl Endpoint for MigrateFiles {
+    type Request = MigrateFilesRequest;
+    type Response = ();
+
+    fn path() -> String {
+        String::from("add_files/migrate_files")
+    }
+}
+
+#[derive(Clone, Debug, Serialize)]
 pub struct ArchiveFilesRequest {
     #[serde(flatten)]
     pub file_selection: FileSelection,

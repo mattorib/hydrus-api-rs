@@ -42,6 +42,7 @@ use std::collections::HashMap;
 use std::fmt::Debug;
 
 use super::common::FileRecordStream;
+use super::endpoints::adding_files::{MigrateFiles, MigrateFilesRequest};
 use super::endpoints::adding_relationships::{SetFileRelationships, SetFileRelationshipsRequest};
 use super::endpoints::adding_tags::{SearchTags, SearchTagsResponse, TagSearchOptions};
 use super::endpoints::adding_times::{SetTime, SetTimeRequest};
@@ -143,6 +144,22 @@ impl Client {
         service: FileServiceSelection,
     ) -> Result<()> {
         self.post::<UndeleteFiles>(UndeleteFilesRequest {
+            file_selection: files,
+            service_selection: service,
+        })
+        .await?;
+
+        Ok(())
+    }
+
+    /// Copies files from one local file domain to another
+    #[tracing::instrument(skip(self), level = "debug")]
+    pub async fn migrate_files(
+        &self,
+        files: FileSelection,
+        service: FileServiceSelection,
+    ) -> Result<()> {
+        self.post::<MigrateFiles>(MigrateFilesRequest {
             file_selection: files,
             service_selection: service,
         })
