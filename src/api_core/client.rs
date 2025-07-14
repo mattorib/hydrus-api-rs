@@ -41,6 +41,7 @@ use serde::Serialize;
 use std::collections::HashMap;
 use std::fmt::Debug;
 
+use super::endpoints::adding_relationships::{SetFileRelationships, SetFileRelationshipsRequest};
 use super::endpoints::adding_tags::{SearchTags, SearchTagsResponse, TagSearchOptions};
 use super::endpoints::adding_times::{SetTime, SetTimeRequest};
 
@@ -329,6 +330,14 @@ impl Client {
     #[tracing::instrument(skip(self), level = "debug")]
     pub async fn add_url(&self, request: AddUrlRequest) -> Result<AddUrlResponse> {
         self.post_and_parse::<AddUrl>(request).await
+    }
+
+    /// Sets the relationship between two files
+    #[tracing::instrument(skip(self), level = "debug")]
+    pub async fn set_file_relationship(&self, request: SetFileRelationshipsRequest) -> Result<()> {
+        self.post::<SetFileRelationships>(request).await?;
+
+        Ok(())
     }
 
     /// Associates urls with the given file hashes

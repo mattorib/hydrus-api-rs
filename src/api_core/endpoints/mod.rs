@@ -5,6 +5,7 @@ use std::fmt::Debug;
 pub mod access_management;
 pub mod adding_files;
 pub mod adding_notes;
+pub mod adding_relationships;
 pub mod adding_tags;
 pub mod adding_times;
 pub mod adding_urls;
