@@ -41,6 +41,7 @@ use serde::Serialize;
 use std::collections::HashMap;
 use std::fmt::Debug;
 
+use super::common::FileRecordStream;
 use super::endpoints::adding_relationships::{SetFileRelationships, SetFileRelationshipsRequest};
 use super::endpoints::adding_tags::{SearchTags, SearchTagsResponse, TagSearchOptions};
 use super::endpoints::adding_times::{SetTime, SetTimeRequest};
@@ -307,6 +308,31 @@ impl Client {
         let bytes = response.bytes().await?.to_vec();
 
         Ok(FileRecord { bytes, mime_type })
+    }
+
+    /// Returns a stream of the bytes of a file from hydrus
+    #[tracing::instrument(skip(self), level = "debug")]
+    pub async fn get_file_stream(&self, id: FileIdentifier) -> Result<FileRecordStream> {
+        let response = match id {
+            FileIdentifier::ID(id) => {
+                self.get::<GetFile, [(&str, u64)]>(&[("file_id", id)])
+                    .await?
+            }
+            FileIdentifier::Hash(hash) => {
+                self.get::<GetFile, [(&str, String)]>(&[("hash", hash)])
+                    .await?
+            }
+        };
+        let mime_type = response
+            .headers()
+            .get("mime-type")
+            .cloned()
+            .map(|h| h.to_str().unwrap().to_string())
+            .unwrap_or("image/jpeg".into());
+
+        let stream = Box::pin(response.bytes_stream());
+
+        Ok(FileRecordStream { stream, mime_type })
     }
 
     /// Returns all files associated with the given url

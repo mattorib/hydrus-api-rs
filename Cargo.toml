@@ -12,7 +12,7 @@ repository = "https://github.com/trivernis/hydrus-api-rs"
 
 [dependencies]
 serde = { version = "1.0.217", features = ["derive"] }
-reqwest = { version = "0.12" }
+reqwest = { version = "0.12", features = ["stream"] }
 tracing = "0.1.32"
 mime = "0.3.16"
 chrono = "0.4.19"
@@ -22,6 +22,7 @@ bytes = "1.1.0"
 ciborium = {version = "0.2.0", optional = true}
 serde_json = {version = "1.0.138", optional = true}
 base64 = {version = "0.13.0", optional = true}
+futures = "0.3.31"
 
 [dev-dependencies]
 maplit = "1.0.2"

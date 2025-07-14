@@ -1,6 +1,8 @@
 use crate::wrapper::service::ServiceName;
+use bytes::Bytes;
+use futures::Stream;
 use serde::Serialize;
-use std::collections::HashMap;
+use std::{collections::HashMap, pin::Pin};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BasicServiceInfo {
@@ -200,6 +202,11 @@ impl From<ServiceName> for FileServiceSelection {
 #[derive(Clone)]
 pub struct FileRecord {
     pub bytes: Vec<u8>,
+    pub mime_type: String,
+}
+
+pub struct FileRecordStream {
+    pub stream: Pin<Box<dyn Stream<Item = reqwest::Result<Bytes>>>>,
     pub mime_type: String,
 }
 
