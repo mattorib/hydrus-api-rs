@@ -1,4 +1,9 @@
-use crate::api_core::endpoints::Endpoint;
+use std::collections::HashMap;
+
+use crate::api_core::{
+    common::{FileSelection, FileServiceSelection},
+    endpoints::Endpoint,
+};
 
 #[derive(Debug, Clone, Serialize)]
 pub struct SetFileRelationshipsRequest {
@@ -104,4 +109,44 @@ impl FileRelationshipBuilder {
             delete_b: self.delete_b,
         }
     }
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct GetFileRelationshipsRequest {
+    #[serde(flatten)]
+    pub file_selection: FileSelection,
+    #[serde(flatten)]
+    pub service_selection: FileServiceSelection,
+}
+
+pub struct GetFileRelationships;
+
+impl Endpoint for GetFileRelationships {
+    type Request = GetFileRelationshipsRequest;
+    type Response = GetFileRelationshipsResponse;
+
+    fn path() -> String {
+        String::from("manage_file_relationships/get_file_relationships")
+    }
+}
+
+#[derive(Debug, Deserialize)]
+pub struct GetFileRelationshipsResponse {
+    pub file_relationships: HashMap<String, FileRelationships>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct FileRelationships {
+    pub is_king: bool,
+    pub king: String,
+    pub king_is_on_file_domain: bool,
+    pub king_is_local: bool,
+    #[serde(rename = "0")]
+    pub potential_duplicates: Vec<String>,
+    #[serde(rename = "1")]
+    pub false_positives: Vec<String>,
+    #[serde(rename = "3")]
+    pub alternates: Vec<String>,
+    #[serde(rename = "8")]
+    pub duplicates: Vec<String>,
 }

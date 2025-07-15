@@ -43,7 +43,10 @@ use std::fmt::Debug;
 
 use super::common::FileRecordStream;
 use super::endpoints::adding_files::{MigrateFiles, MigrateFilesRequest};
-use super::endpoints::adding_relationships::{SetFileRelationships, SetFileRelationshipsRequest};
+use super::endpoints::adding_relationships::{
+    GetFileRelationships, GetFileRelationshipsRequest, GetFileRelationshipsResponse,
+    SetFileRelationships, SetFileRelationshipsRequest,
+};
 use super::endpoints::adding_tags::{SearchTags, SearchTagsResponse, TagSearchOptions};
 use super::endpoints::adding_times::{SetTime, SetTimeRequest};
 
@@ -373,6 +376,22 @@ impl Client {
     #[tracing::instrument(skip(self), level = "debug")]
     pub async fn add_url(&self, request: AddUrlRequest) -> Result<AddUrlResponse> {
         self.post_and_parse::<AddUrl>(request).await
+    }
+
+    /// Gets the current relationships for one or more files
+    #[tracing::instrument(skip(self), level = "debug")]
+    pub async fn get_file_relationships(
+        &self,
+        files: FileSelection,
+        service: FileServiceSelection,
+    ) -> Result<GetFileRelationshipsResponse> {
+        self.get_and_parse::<GetFileRelationships, GetFileRelationshipsRequest>(
+            &GetFileRelationshipsRequest {
+                file_selection: files,
+                service_selection: service,
+            },
+        )
+        .await
     }
 
     /// Sets the relationship between two files
